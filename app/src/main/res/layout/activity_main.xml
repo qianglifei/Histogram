@@ -12,9 +12,7 @@
         android:layout_marginTop="200dp"
         android:layout_width="match_parent"
         android:layout_height="200dp"
-        android:background="#ff00"
-        android:layout_marginLeft="15dp"
-        android:layout_marginRight="15dp"
+        android:background="#00ff00"
         android:layout_below="@+id/linearLayout_title"/>
 
 </LinearLayout>

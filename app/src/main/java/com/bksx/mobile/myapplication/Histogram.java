@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Histogram extends View {
-   int MAX = 100;//矩形显示的最大值
+   int MAX = 0;//矩形显示的最大值
    int corner = 5; //矩形的角度。 设置为0 则没有角度。
    double data = 0.0;//显示的数
-   double tempData = 0; //初始数据
-   int textPadding = 50; //字体与矩形图的距离
+   double tempData,tempData2,tempData3; //初始数据
+   int textPadding = 18; //字体与矩形图的距离
 
    int mColor;
    private Context mContext;
@@ -69,6 +69,7 @@ public class Histogram extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         min_height = (int) (0.7 * h);
         min_weight = (int) (0.7 * w);
+        Log.i("TAG", "===onSizeChanged: " + min_height);
     }
     @Override
    public void draw(Canvas canvas) {
@@ -123,96 +124,137 @@ public class Histogram extends View {
    }
 
     private void drawPic(Canvas canvas) {
-        //防止数值很大的的时候，动画时间过长
-
-        int step = (int) (data / 100 + 1.0);
-        Log.i("TAG", "===draw: "+ step);
-        if (tempData < data - step) {
-            tempData = tempData + step;
-        } else {
-            tempData = data;
-        }
-        //画圆角矩形
-        String S = tempData + "%"; //如果数字后面需要加% 则在""中添加%
-        // 一个字和两,三个字的字号相同
-        if (S.length() < 4) {
-         mPaint.setTextSize(getWidth()/2);
-        } else {
-         mPaint.setTextSize(30); //可以通过getWidth()/2 改变字体大小 也可以通过设置数字来改变自己想要的字体大小 当超出矩形图宽度时不能显示全部
-        }
         //文本上坡度和下坡度 总和是文本的高度
-        float textH = mPaint.ascent() + mPaint.descent();
-        float MaxH = getHeight() - textH - 2 *  DensityUtil.px2dip(mContext, textPadding);
-        //圆角矩形的实际高度
-        float realH = (float) (MaxH / MAX * tempData);
-
+        float textH = mPaint.ascent() + mPaint.descent() + textPadding;
+        float MaxH = getHeight() - textH - 2 * min_height;
         for (int i = 0; i < dataList.size(); i++) {
+            //防止数值很大的的时候，动画时间过长
+            int step = dataList.get(i) / 100;
             int leftR = 20  + i * min_weight + min_weight / 2;
             int rightR = leftR + min_weight / 2;
-            int buttomR = 20  + min_height * 4;
-            int topR = buttomR - (int) (getHeight() / 100 * dataList.get(i));
+            int buttomR = min_height * 5;
             if (i == 0){
+
+                //圆角矩形的实际高度
+                float realH = (float) (MaxH / MAX * tempData);
+                if (tempData < dataList.get(i) - step) {
+                    tempData = tempData + step;
+                } else {
+                    tempData = dataList.get(i);
+                }
+                //画圆角矩形
+                String S = tempData + ""; //如果数字后面需要加% 则在""中添加%
+                // 一个字和两,三个字的字号相同
+                if (S.length() < 4) {
+                    mPaint.setTextSize(getWidth()/2);
+                } else {
+                    mPaint.setTextSize(30); //可以通过getWidth()/2 改变字体大小 也可以通过设置数字来改变自己想要的字体大小 当超出矩形图宽度时不能显示全部
+                }
                 Log.i("TAG", "===drawPic: " + i);
                 mPaint.setColor(Color.parseColor("#00EBEB"));
-                RectF oval = new RectF(leftR + 70, getHeight() - realH -40 , rightR-70, buttomR);// 设置个新的长方形
+                Log.i("TAG", "===drawPicTop: " + (getHeight() - realH -min_height));
+                Log.i("TAG", "===drawPicBottom: " + buttomR);
+                RectF oval = new RectF(leftR + 70, getHeight() - realH -min_height , rightR-70, buttomR);// 设置个新的长方形
                 //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
                 canvas.drawRoundRect(oval, DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
                 //写数字
                 canvas.drawText(S,
-                  getWidth() * 0.5f - mPaint.measureText(S) * 0.5f,
-                  getHeight() - realH - 2 *  DensityUtil.px2dip(mContext, textPadding),
-                  mPaint);
+                        leftR + 70f + mPaint.measureText(S) * 0.5f,
+                  getHeight() - realH - min_height - 20,
+                  mTextPaint);
+                continue;
             }else if (i == 1){
+                //圆角矩形的实际高度
+                float realH2 = (int) (MaxH / MAX * tempData2);
+                if (tempData2 < dataList.get(i) - step) {
+                    tempData2 = tempData2 + step;
+                } else {
+                    tempData2 = dataList.get(i);
+                }
+                //画圆角矩形
+                String S = tempData2 + ""; //如果数字后面需要加% 则在""中添加%
+                // 一个字和两,三个字的字号相同
+                if (S.length() < 4) {
+                    mPaint.setTextSize(getWidth()/2);
+                } else {
+                    mPaint.setTextSize(30); //可以通过getWidth()/2 改变字体大小 也可以通过设置数字来改变自己想要的字体大小 当超出矩形图宽度时不能显示全部
+                }
                 Log.i("TAG", "===drawPic: " + i);
-                mPaint.setColor(Color.parseColor("#62E0FF"));
-                //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
-                RectF oval = new RectF(leftR + 70, getHeight() - realH -40 , rightR-70, buttomR);// 设置个新的长方形
-                //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
-                canvas.drawRoundRect(oval, DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
+                mPaint.setColor(Color.parseColor("#23E0FF"));
+                RectF ova1 = new RectF(leftR + 70, getHeight() - realH2 - min_height , rightR-70, buttomR);// 设置个新的长方形
+                canvas.drawRoundRect(ova1, DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
+                //写数字
+                canvas.drawText(S,
+                        leftR + 70f + mPaint.measureText(S) * 0.5f,
+                        getHeight() - realH2 - min_height - 20,
+                        mTextPaint);
+                if (tempData2 != dataList.get(i)) {
+                    postInvalidate();
+                }
+                continue;
             }else if (i == 2){
+                //圆角矩形的实际高度
+                float realH3 = (float) (MaxH / MAX * tempData3);
+                if (tempData3 < dataList.get(i) - step) {
+                    tempData3 = tempData3 + step;
+                } else {
+                    tempData3 = dataList.get(i);
+                }
+                //画圆角矩形
+                String S = tempData3 + ""; //如果数字后面需要加% 则在""中添加%
+                // 一个字和两,三个字的字号相同
+                if (S.length() < 4) {
+                    mPaint.setTextSize(getWidth()/2);
+                } else {
+                    mPaint.setTextSize(30); //可以通过getWidth()/2 改变字体大小 也可以通过设置数字来改变自己想要的字体大小 当超出矩形图宽度时不能显示全部
+                }
                 Log.i("TAG", "===drawPic: " + i);
                 mPaint.setColor(Color.parseColor("#FDB33F"));
                 //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
-                RectF oval = new RectF(leftR + 70, getHeight() - realH -40 , rightR-70, buttomR);// 设置个新的长方形
+                RectF oval = new RectF(leftR + 70, getHeight() - realH3 -min_height , rightR-70, buttomR);// 设置个新的长方形
                 //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
                 canvas.drawRoundRect(oval, DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
+                //写数字
+                canvas.drawText(S,
+                        leftR + 70f + mPaint.measureText(S) * 0.5f,
+                        getHeight() - realH3 - min_height - 20,
+                        mTextPaint);
+                if (tempData3 != dataList.get(i)) {
+                    postInvalidate();
+                }
+                continue;
             }
-        }
-        if (tempData != data) {
-            postInvalidate();
         }
     }
 
     private void drawBottomText(Canvas canvas) {
-        float min_weight = (getWidth() - 70 ) / (dataList.size());
+        min_weight = (getWidth() - 60 ) / (dataList.size());
         mTextPaint.setTextSize(DensityUtil.dip2px(mContext,16));
         mTextPaint.setTextAlign(Paint.Align.CENTER);
         for (int i = 0; i < dataList.size(); i++) {
             int leftR = (int) (20  + i * min_weight + min_weight / 2);
             int rightR = leftR + (int) (min_weight / 2);
-            int buttomR = (int) (20  + min_height * 4);
+            int buttomR = (int) (min_height * 5 + min_height*0.7);
             int topR = buttomR - (int) (getHeight() / 100 * dataList.get(i));
             mTextPaint.setARGB(255, 51, 51, 51);
-            canvas.drawText(title.get(i), leftR + min_weight / 4, buttomR + 30, mTextPaint);
-//            mTextPaint.setARGB(255, 51, 51, 51);
-//            canvas.drawText(title.get(i) + "", leftR + min_weight / 4, topR - 10, mTextPaint);
+            canvas.drawText(title.get(i), leftR + min_weight / 4, buttomR, mTextPaint);
         }
     }
 
     private void drawLine(Canvas canvas) {
-     min_height = getHeight() / 5;
-     for (int i = 4; i >= 0; i--) {
+     min_height = (getHeight()) / 6;
+     for (int i = 5; i >= 1; i--) {
          if (i == 4) {
-             mLinePaint.setARGB(255, 131, 148, 144);
-             canvas.drawLine(70 , 20  + min_height * i, 70  + getWidth(), 20  + min_height * i, mLinePaint);
+             mLinePaint.setColor(Color.parseColor("#000000"));
+             canvas.drawLine(DensityUtil.dip2px(mContext,70),  min_height * i, getWidth(), min_height * i, mLinePaint);
          } else {
-             mLinePaint.setARGB(255, 223, 233, 231);
-             mLinePaint.setPathEffect(new DashPathEffect(new float[] {15, 5}, 0));
-             canvas.drawLine(70 , 20  + min_height * i, 70  + getWidth(), 20  + min_height * i, mLinePaint);
+             mLinePaint.setColor(Color.parseColor("#000000"));
+             //mLinePaint.setPathEffect(new DashPathEffect(new float[] {15, 5}, 0));
+             canvas.drawLine(DensityUtil.dip2px(mContext,70) ,  min_height * i,  getWidth(),  min_height * i, mLinePaint);
          }
          mTextPaint.setTextAlign(Paint.Align.RIGHT);
          mTextPaint.setTextSize(DensityUtil.dip2px(mContext,16));
-         canvas.drawText(tagging[i], 60, 32 + min_height * i, mTextPaint);
+         canvas.drawText(tagging[i-1], DensityUtil.dip2px(mContext,65),  min_height * i + 15, mTextPaint);
      }
  }
 
