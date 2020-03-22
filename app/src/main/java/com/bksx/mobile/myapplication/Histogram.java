@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -18,7 +19,7 @@ import java.util.List;
 public class Histogram extends View {
    int MAX = 0;//矩形显示的最大值
    int corner = 5; //矩形的角度。 设置为0 则没有角度。
-   double data = 0.0;//显示的数
+   double data = 500.0;//显示的数
    double tempData,tempData2,tempData3; //初始数据
    int textPadding = 18; //字体与矩形图的距离
 
@@ -89,38 +90,6 @@ public class Histogram extends View {
 //        return;
 //      }
 //
-//    //防止数值很大的的时候，动画时间过长
-//    int step = (int) (data / 100 + 1.0);
-//    Log.i("TAG", "===draw: "+ step);
-//    if (tempData < data - step) {
-//     tempData = tempData + step;
-//    } else {
-//     tempData = data;
-//    }
-//    //画圆角矩形
-//    String S = tempData + "%"; //如果数字后面需要加% 则在""中添加%
-//
-//    //一个字和两,三个字的字号相同
-//    if (S.length() < 4) {
-//     mPaint.setTextSize(getWidth()/2);
-//    } else {
-//     mPaint.setTextSize(30); //可以通过getWidth()/2 改变字体大小 也可以通过设置数字来改变自己想要的字体大小 当超出矩形图宽度时不能显示全部
-//    }
-//    //文本上坡度和下坡度 总和是文本的高度
-//    float textH = mPaint.ascent() + mPaint.descent();
-//    float MaxH = getHeight() - textH - 2 *  DensityUtil.px2dip(mContext, textPadding);
-//    //圆角矩形的实际高度
-//    float realH = (float) (MaxH / MAX * tempData);
-//    RectF oval3 = new RectF(0, getHeight() - realH, getWidth(), getHeight());// 设置个新的长方形
-//    canvas.drawRoundRect(oval3,  DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
-//    //写数字
-//    canvas.drawText(S,
-//      getWidth() * 0.5f - mPaint.measureText(S) * 0.5f,
-//      getHeight() - realH - 2 *  DensityUtil.px2dip(mContext, textPadding),
-//      mPaint);
-//     if (tempData != data) {
-//         postInvalidate();
-//     }
    }
 
     private void drawPic(Canvas canvas) {
@@ -133,6 +102,8 @@ public class Histogram extends View {
             int leftR = 20  + i * min_weight + min_weight / 2;
             int rightR = leftR + min_weight / 2;
             int buttomR = min_height * 5;
+            //int topR = buttomR - (int) (hei / 100 * mData.get(i));
+
             if (i == 0){
 
                 //圆角矩形的实际高度
@@ -156,7 +127,7 @@ public class Histogram extends View {
                 Log.i("TAG", "===drawPicBottom: " + buttomR);
                 RectF oval = new RectF(leftR + 70, getHeight() - realH -min_height , rightR-70, buttomR);// 设置个新的长方形
                 //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
-                canvas.drawRoundRect(oval, DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
+                canvas.drawRect(oval, mPaint);
                 //写数字
                 canvas.drawText(S,
                         leftR + 70f + mPaint.measureText(S) * 0.5f,
@@ -182,7 +153,7 @@ public class Histogram extends View {
                 Log.i("TAG", "===drawPic: " + i);
                 mPaint.setColor(Color.parseColor("#23E0FF"));
                 RectF ova1 = new RectF(leftR + 70, getHeight() - realH2 - min_height , rightR-70, buttomR);// 设置个新的长方形
-                canvas.drawRoundRect(ova1, DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
+                canvas.drawRect(ova1,mPaint);
                 //写数字
                 canvas.drawText(S,
                         leftR + 70f + mPaint.measureText(S) * 0.5f,
@@ -210,19 +181,19 @@ public class Histogram extends View {
                 }
                 Log.i("TAG", "===drawPic: " + i);
                 mPaint.setColor(Color.parseColor("#FDB33F"));
+                //canvas.drawRect(new RectF(leftR, getHeight(), rightR, buttomR), mPaint);
+                RectF oval = new RectF(leftR + 70, getHeight()-realH3-min_height , rightR-70, buttomR);// 设置个新的长方形
                 //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
-                RectF oval = new RectF(leftR + 70, getHeight() - realH3 -min_height , rightR-70, buttomR);// 设置个新的长方形
-                //canvas.drawRect(new RectF(leftR, topR, rightR, buttomR), mPaint);
-                canvas.drawRoundRect(oval, DensityUtil.px2dip(mContext, corner),  DensityUtil.px2dip(mContext, corner), mPaint);
+                canvas.drawRect(oval, mPaint);
                 //写数字
                 canvas.drawText(S,
                         leftR + 70f + mPaint.measureText(S) * 0.5f,
                         getHeight() - realH3 - min_height - 20,
                         mTextPaint);
                 if (tempData3 != dataList.get(i)) {
-                    postInvalidate();
+                    invalidate();
                 }
-                continue;
+                //continue;
             }
         }
     }
